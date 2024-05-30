@@ -8,6 +8,11 @@ from sklearn.neural_network import MLPClassifier
 import pickle
 import numpy as np
 import pandas as pd
+from scipy.stats import shapiro
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy.stats import f_oneway
+from statsmodels.stats.multicomp import MultiComparison
 
 with open("./../../credit.pkl", "rb") as f:
     x_credit_treinamento, y_credito_treinamento, x_credit_teste, y_credit_teste = (
@@ -50,11 +55,11 @@ for i in range(30):
     svm = SVC(kernel="rbf", C=2.0)
     scores = cross_val_score(svm, x_credit, y_credit, cv=kFold)
     resultados_svm.append(scores.mean())
-
+    print("rede")
     rede_neural = MLPClassifier(activation="relu", batch_size=56, solver="adam")
     scores = cross_val_score(rede_neural, x_credit, y_credit, cv=kFold)
     resultados_rede_neural.append(scores.mean())
-
+print("----------------------")
 print(resultados_arvore)
 resultados = pd.DataFrame(
     {
@@ -70,3 +75,244 @@ print(resultados)
 print(resultados.describe)
 print(resultados.var())
 print((resultados.std() / resultados.mean()) / 100)
+
+print(
+    shapiro(resultados_arvore),
+    shapiro(resultados_random_forest),
+    shapiro(resultados_knn),
+    shapiro(resultados_logistica),
+    shapiro(resultados_svm),
+    shapiro(resultados_rede_neural),
+)
+sns.displot(resultados_arvore, kind="kde")
+plt.show()
+sns.displot(resultados_random_forest, kind="kde")
+print(sns)
+plt.show()
+sns.displot(resultados_knn, kind="kde")
+plt.show()
+print(sns)
+sns.displot(resultados_logistica, kind="kde")
+plt.show()
+print(sns)
+sns.displot(resultados_svm, kind="kde")
+plt.show()
+print(sns)
+sns.displot(resultados_rede_neural, kind="kde")
+plt.show()
+print(sns)
+_, p = f_oneway(
+    resultados_arvore,
+    resultados_random_forest,
+    resultados_knn,
+    resultados_logistica,
+    resultados_svm,
+    resultados_rede_neural,
+)
+aplha = 0.05
+if p <= aplha:
+    print("Hipótese nula. Dados são diferentes")
+else:
+    print("Hipótese alternativa rejeitada")
+
+resultados_algoritmos = {
+    "accuracy": np.concatenate(
+        [
+            resultados_arvore,
+            resultados_random_forest,
+            resultados_knn,
+            resultados_logistica,
+            resultados_svm,
+            resultados_rede_neural,
+        ]
+    ),
+    "algoritmo": [
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "arvore",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "random_forest",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "knn",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "logistica",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "svm",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+        "rede_neural",
+    ],
+}
+resultados_df = pd.DataFrame(resultados_algoritmos)
+compara_algoritmos = MultiComparison(
+    resultados_df["accuracy"], resultados_df["algoritmo"]
+)
+teste_estatistico = compara_algoritmos.tukeyhsd()
+print(teste_estatistico)
+teste_estatistico.plot_simultaneous().show()
