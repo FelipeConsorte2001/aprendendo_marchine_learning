@@ -1,8 +1,9 @@
 import pandas as pd
-import plotly.express as px
 from sklearn.preprocessing import StandardScaler
-from scipy.cluster.hierarchy import dendrogram, linkage
-from sklearn.cluster import AgglomerativeClustering
+import matplotlib.pyplot as plt
+from sklearn.cluster import DBSCAN
+import numpy as np
+import plotly.express as px
 
 base_cartao = pd.read_csv("./../../database/credit_card_clients.csv", header=1)
 base_cartao["BILL_TOTAL"] = (
@@ -19,10 +20,9 @@ print(base_cartao)
 scaler_cartao = StandardScaler()
 x_cartao = scaler_cartao.fit_transform(x_cartao)
 print(x_cartao)
-dendrograma = dendrogram(linkage(x_cartao, method="ward"))
-# plt.show()
-hc_cartao = AgglomerativeClustering(n_clusters=3, metric="euclidean", linkage="ward")
-rotulos = hc_cartao.fit_predict(x_cartao)
-print(rotulos)
+dbscan_cartao = DBSCAN(eps=0.37, min_samples=5)
+rotulos = dbscan_cartao.fit_predict(x_cartao)
+# print(rotulos)
+# print(np.unique(rotulos, return_counts=True))
 grafico = px.scatter(x=x_cartao[:, 0], y=x_cartao[:, 1], color=rotulos)
 grafico.show()

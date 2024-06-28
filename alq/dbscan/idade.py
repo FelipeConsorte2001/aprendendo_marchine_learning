@@ -1,9 +1,7 @@
 import numpy as np
 import plotly.express as px
 from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
-from scipy.cluster.hierarchy import dendrogram, linkage
-from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import DBSCAN
 
 x = [20, 27, 21, 37, 46, 53, 55, 47, 52, 32, 39, 41, 39, 48, 48]
 y = [
@@ -48,13 +46,9 @@ scaler_salario = StandardScaler()
 base_salario = scaler_salario.fit_transform(base_salario)
 
 print(base_salario)
-dendrograma = dendrogram(linkage(base_salario, method="ward"))
-plt.title("Dendrograma")
-plt.xlabel("Pessoas")
-plt.ylabel("Distância")
-plt.show()
-hc_salario = AgglomerativeClustering(n_clusters=3, linkage="ward", metric="euclidean")
-rotulos = hc_salario.fit_predict(base_salario)
+dbscan_salario = DBSCAN(eps=0.95, min_samples=2)
+dbscan_salario.fit(base_salario)
+rotulos = dbscan_salario.labels_
 print(rotulos)
-grafico1 = px.scatter(x=base_salario[:, 0], y=base_salario[:, 1], color=rotulos)
-grafico1.show()
+grafico = px.scatter(x=base_salario[:, 0], y=base_salario[:, 1], color=rotulos)
+grafico.show()
