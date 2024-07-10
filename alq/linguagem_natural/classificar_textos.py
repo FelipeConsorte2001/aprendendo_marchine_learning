@@ -8,6 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from spacy.lang.pt.stop_words import STOP_WORDS
 from spacy.training import Example
+from sklearn.metrics import confusion_matrix, accuracy_score
 
 base_dados = pd.read_csv("./../../database/base_treinamento.txt", encoding="utf-8")
 
@@ -62,31 +63,31 @@ categorias.add_label("ALEGRIA")
 categorias.add_label("MEDO")
 historico = []
 modelo.begin_training()
-for epoca in range(1000):
-    random.shuffle(base_dados_final)
-    losses = {}
-    for batch in spacy.util.minibatch(base_dados_final, 30):
-        textos = [modelo(texto) for texto, entities in batch]
-        annotations = [{"cats": entities} for texto, entities in batch]
-        examples = [
-            Example.from_dict(doc, annotation)
-            for doc, annotation in zip(textos, annotations)
-        ]
-        modelo.update(examples, losses=losses)
-    if epoca % 100 == 0:
-        print(losses)
-        historico.append(losses)
-historico_loss = []
-for i in historico:
-    historico_loss.append(i.get("textcat"))
-historico_loss = np.array(historico_loss)
-print(historico_loss)
-plt.plot(historico_loss)
-plt.title("progressão do erro")
-plt.xlabel("Épocas")
-plt.ylabel("Erro")
-plt.show()
-modelo.to_disk("modelo")
+# for epoca in range(1000):
+#     random.shuffle(base_dados_final)
+#     losses = {}
+#     for batch in spacy.util.minibatch(base_dados_final, 30):
+#         textos = [modelo(texto) for texto, entities in batch]
+#         annotations = [{"cats": entities} for texto, entities in batch]
+#         examples = [
+#             Example.from_dict(doc, annotation)
+#             for doc, annotation in zip(textos, annotations)
+#         ]
+#         modelo.update(examples, losses=losses)
+#     if epoca % 100 == 0:
+#         print(losses)
+#         historico.append(losses)
+# historico_loss = []
+# for i in historico:
+#     historico_loss.append(i.get("textcat"))
+# historico_loss = np.array(historico_loss)
+# print(historico_loss)
+# plt.plot(historico_loss)
+# plt.title("progressão do erro")
+# plt.xlabel("Épocas")
+# plt.ylabel("Erro")
+# plt.show()
+# modelo.to_disk("modelo")
 modelo_carregado = spacy.load("modelo")
 texto_positivo = "eu adoro a cor dos seus olhos"
 texto_positivo = preprocessamento(texto_positivo)
@@ -94,3 +95,22 @@ previsao = modelo_carregado(texto_positivo)
 print(previsao.cats)
 previsao = modelo_carregado(preprocessamento("estou com medo dele"))
 print(previsao.cats)
+
+previsoes = []
+for texto in base_dados["texto"]:
+    previsao = modelo_carregado(texto)
+    previsoes.append(previsao.cats)
+print(previsoes)
+previsao_final = []
+for previsao in previsoes:
+    if previsao["ALEGRIA"] > previsao["MEDO"]:
+        previsao_final.append("alegria")
+    else:
+        previsao_final.append("medo")
+
+previsao_final = np.array(previsao_final)
+print(previsao_final)
+respostas_reais = base_dados["emocao"].values
+print(accuracy_score(respostas_reais, previsao_final))
+cm = confusion_matrix(respostas_reais, previsao_final)
+print(cm)
