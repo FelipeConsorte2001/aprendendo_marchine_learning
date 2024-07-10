@@ -63,31 +63,31 @@ categorias.add_label("ALEGRIA")
 categorias.add_label("MEDO")
 historico = []
 modelo.begin_training()
-# for epoca in range(1000):
-#     random.shuffle(base_dados_final)
-#     losses = {}
-#     for batch in spacy.util.minibatch(base_dados_final, 30):
-#         textos = [modelo(texto) for texto, entities in batch]
-#         annotations = [{"cats": entities} for texto, entities in batch]
-#         examples = [
-#             Example.from_dict(doc, annotation)
-#             for doc, annotation in zip(textos, annotations)
-#         ]
-#         modelo.update(examples, losses=losses)
-#     if epoca % 100 == 0:
-#         print(losses)
-#         historico.append(losses)
-# historico_loss = []
-# for i in historico:
-#     historico_loss.append(i.get("textcat"))
-# historico_loss = np.array(historico_loss)
-# print(historico_loss)
-# plt.plot(historico_loss)
-# plt.title("progressão do erro")
-# plt.xlabel("Épocas")
-# plt.ylabel("Erro")
-# plt.show()
-# modelo.to_disk("modelo")
+for epoca in range(1000):
+    random.shuffle(base_dados_final)
+    losses = {}
+    for batch in spacy.util.minibatch(base_dados_final, 30):
+        textos = [modelo(texto) for texto, entities in batch]
+        annotations = [{"cats": entities} for texto, entities in batch]
+        examples = [
+            Example.from_dict(doc, annotation)
+            for doc, annotation in zip(textos, annotations)
+        ]
+        modelo.update(examples, losses=losses)
+    if epoca % 100 == 0:
+        print(losses)
+        historico.append(losses)
+historico_loss = []
+for i in historico:
+    historico_loss.append(i.get("textcat"))
+historico_loss = np.array(historico_loss)
+print(historico_loss)
+plt.plot(historico_loss)
+plt.title("progressão do erro")
+plt.xlabel("Épocas")
+plt.ylabel("Erro")
+plt.show()
+modelo.to_disk("modelo")
 modelo_carregado = spacy.load("modelo")
 texto_positivo = "eu adoro a cor dos seus olhos"
 texto_positivo = preprocessamento(texto_positivo)
