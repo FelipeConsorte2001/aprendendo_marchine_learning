@@ -63,20 +63,20 @@ categorias.add_label("ALEGRIA")
 categorias.add_label("MEDO")
 historico = []
 modelo.begin_training()
-# for epoca in range(1000):
-#     random.shuffle(base_dados_final)
-#     losses = {}
-#     for batch in spacy.util.minibatch(base_dados_final, 30):
-#         textos = [modelo(texto) for texto, entities in batch]
-#         annotations = [{"cats": entities} for texto, entities in batch]
-#         examples = [
-#             Example.from_dict(doc, annotation)
-#             for doc, annotation in zip(textos, annotations)
-#         ]
-#         modelo.update(examples, losses=losses)
-#     if epoca % 100 == 0:
-#         print(losses)
-#         historico.append(losses)
+for epoca in range(1000):
+    random.shuffle(base_dados_final)
+    losses = {}
+    for batch in spacy.util.minibatch(base_dados_final, 30):
+        textos = [modelo(texto) for texto, entities in batch]
+        annotations = [{"cats": entities} for texto, entities in batch]
+        examples = [
+            Example.from_dict(doc, annotation)
+            for doc, annotation in zip(textos, annotations)
+        ]
+        modelo.update(examples, losses=losses)
+    if epoca % 100 == 0:
+        print(losses)
+        historico.append(losses)
 historico_loss = []
 print("*********")
 for i in historico:
