@@ -63,21 +63,22 @@ categorias.add_label("ALEGRIA")
 categorias.add_label("MEDO")
 historico = []
 modelo.begin_training()
-for epoca in range(1000):
-    random.shuffle(base_dados_final)
-    losses = {}
-    for batch in spacy.util.minibatch(base_dados_final, 30):
-        textos = [modelo(texto) for texto, entities in batch]
-        annotations = [{"cats": entities} for texto, entities in batch]
-        examples = [
-            Example.from_dict(doc, annotation)
-            for doc, annotation in zip(textos, annotations)
-        ]
-        modelo.update(examples, losses=losses)
-    if epoca % 100 == 0:
-        print(losses)
-        historico.append(losses)
+# for epoca in range(1000):
+#     random.shuffle(base_dados_final)
+#     losses = {}
+#     for batch in spacy.util.minibatch(base_dados_final, 30):
+#         textos = [modelo(texto) for texto, entities in batch]
+#         annotations = [{"cats": entities} for texto, entities in batch]
+#         examples = [
+#             Example.from_dict(doc, annotation)
+#             for doc, annotation in zip(textos, annotations)
+#         ]
+#         modelo.update(examples, losses=losses)
+#     if epoca % 100 == 0:
+#         print(losses)
+#         historico.append(losses)
 historico_loss = []
+print("*********")
 for i in historico:
     historico_loss.append(i.get("textcat"))
 historico_loss = np.array(historico_loss)
@@ -114,3 +115,24 @@ respostas_reais = base_dados["emocao"].values
 print(accuracy_score(respostas_reais, previsao_final))
 cm = confusion_matrix(respostas_reais, previsao_final)
 print(cm)
+# avaliação base de dados
+base_dados_teste = pd.read_csv("./../../database/base_teste.txt", encoding="utf-8")
+
+base_dados_teste["texto"] = base_dados_teste["texto"].apply(preprocessamento)
+previsoes = []
+for texto in base_dados_teste["texto"]:
+    previsao = modelo_carregado(texto)
+    previsoes.append(previsao.cats)
+
+previsoes_final = []
+for previsao in previsoes:
+    if previsao["ALEGRIA"] > previsao["MEDO"]:
+        previsoes_final.append("alegria")
+    else:
+        previsoes_final.append("medo")
+
+previsoes_final = np.array(previsoes_final)
+respostas_reais = base_dados_teste["emocao"].values
+print(accuracy_score(respostas_reais, previsoes_final))
+cm2 = confusion_matrix(respostas_reais, previsoes_final)
+print(cm2)
